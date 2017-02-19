@@ -117,28 +117,23 @@ void MyPrimitive::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivis
 	Init();
 
 	//Your code starts here
-	float fValue = 0.5f;
-	//3--2
-	//|  |
-	//0--1
+	float hheight = a_fHeight / 2;
 	std::vector<vector3> point;
-	vector3 top = vector3(0.0f,0.0f,a_fHeight);
-	vector3 bottom = vector3(0.0f, 0.0f, 0.0f);
+
+	vector3 top = vector3(0.0f,0.0f, hheight);//the tip of the cone
+	vector3 bottom = vector3(0.0f, 0.0f, -hheight);//the center of the bottom of the cone
 	
-	point.push_back(vector3(a_fRadius,0.0f,0.0f));
+	point.push_back(vector3(a_fRadius,0.0f,-hheight));//the first point in the cone base
 
 	float subsize = PI * 2.0 / static_cast<float>(a_nSubdivisions);
-	float angle = 0.0;
-	for (int i = 1; i < a_nSubdivisions; i++) {
-		point.push_back(vector3(cos(angle), sin(angle), 0.0f));
+	float angle = subsize;
+	for (int i = 1; i <= a_nSubdivisions; i++) {
+		point.push_back(vector3(cos(angle)*a_fRadius, sin(angle)*a_fRadius, -hheight));
 
 		AddTri(bottom, point[i], point[i - 1]);
 		AddTri(point[i - 1], point[i],top);
 		angle += subsize;
 	}
-
-	AddTri(bottom, point[a_nSubdivisions-1], point[0]);
-	AddTri(point[a_nSubdivisions - 1], point[0], top);
 	
 	//Your code ends here
 	CompileObject(a_v3Color);
@@ -154,16 +149,29 @@ void MyPrimitive::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubd
 	Init();
 
 	//Your code starts here
-	float fValue = 0.5f;
-	//3--2
-	//|  |
-	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
+	float hheight = a_fHeight/2;
 
-	AddQuad(point0, point1, point3, point2);
+	vector3 top(0.0f,0.0f,hheight); //top center of cylinder
+	vector3 bottom(0.0f, 0.0f, -hheight); //bottom center of cylinder
+
+	std::vector<vector3> point;
+
+	point.push_back(vector3(a_fRadius, 0.0f, -hheight));//the first point in the cylinder bottom
+	point.push_back(vector3(a_fRadius, 0.0f, hheight));//the first point in the cylinder top 
+	
+
+	float subsize = PI * 2.0 / static_cast<float>(a_nSubdivisions);
+	float angle = subsize;
+	for (int i = 2; i <= a_nSubdivisions*2; i+=2) {
+		point.push_back(vector3(cos(angle)*a_fRadius, sin(angle)*a_fRadius, -hheight));
+		point.push_back(vector3(cos(angle)*a_fRadius, sin(angle)*a_fRadius, hheight));
+
+		AddQuad(point[i - 2], point[i], point[i - 1], point[i + 1]);
+
+		AddTri(bottom, point[i], point[i - 2]);
+		AddTri(top, point[i-1], point[i + 1]);
+		angle += subsize;
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
@@ -179,16 +187,33 @@ void MyPrimitive::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float
 	Init();
 
 	//Your code starts here
-	float fValue = 0.5f;
-	//3--2
-	//|  |
-	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
+	float hheight = a_fHeight / 2;
 
-	AddQuad(point0, point1, point3, point2);
+	std::vector<vector3> point;
+
+	point.push_back(vector3(a_fInnerRadius, 0.0f, -hheight));//the first point in the tube inner bottom
+	point.push_back(vector3(a_fInnerRadius, 0.0f, hheight));//the first point in the tube inner top 
+
+	point.push_back(vector3(a_fOuterRadius, 0.0f, -hheight));//the first point in the tube outer bottom
+	point.push_back(vector3(a_fOuterRadius, 0.0f, hheight));//the first point in the tube outer top 
+
+
+	float subsize = PI * 2.0 / static_cast<float>(a_nSubdivisions);
+	float angle = subsize;
+	for (int i = 4; i <= a_nSubdivisions * 4; i += 4) {
+		point.push_back(vector3(cos(angle)*a_fInnerRadius, sin(angle)*a_fInnerRadius, -hheight));
+		point.push_back(vector3(cos(angle)*a_fInnerRadius, sin(angle)*a_fInnerRadius, hheight));
+
+		point.push_back(vector3(cos(angle)*a_fOuterRadius, sin(angle)*a_fOuterRadius, -hheight));
+		point.push_back(vector3(cos(angle)*a_fOuterRadius, sin(angle)*a_fOuterRadius, hheight));
+
+		AddQuad(point[i], point[i - 4], point[i + 1], point[i - 3]);
+		AddQuad(point[i - 2], point[i+2], point[i - 1], point[i + 3]);
+
+		AddQuad(point[i - 1], point[i+3], point[i - 3], point[i + 1]);
+		AddQuad(point[i - 4], point[i], point[i - 2], point[i + 2]);
+		angle += subsize;
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
