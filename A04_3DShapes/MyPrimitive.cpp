@@ -259,23 +259,59 @@ void MyPrimitive::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a
 		GenerateCube(a_fRadius * 2, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	if (a_nSubdivisions > 10)
+		a_nSubdivisions = 10;
 
 	Release();
 	Init();
 
-	//Your code starts here
-	float fValue = 0.5f;
-	//3--2
-	//|  |
-	//0--1
-	vector3 point0(-fValue, -fValue, fValue); //0
-	vector3 point1(fValue, -fValue, fValue); //1
-	vector3 point2(fValue, fValue, fValue); //2
-	vector3 point3(-fValue, fValue, fValue); //3
 
-	AddQuad(point0, point1, point3, point2);
+	std::vector<vector3> point;
+
+	vector3 top(0.0f, 0.0f, a_fRadius);//top of sphere
+	vector3 bottom(0.0f, 0.0f, -a_fRadius);//bottom of sphere
+
+	float h_subs = PI * 2.0f / static_cast<float>(a_nSubdivisions);
+	float v_subs = PI / static_cast<float>(a_nSubdivisions);
+	float h_angle = 0.0f;
+	float v_angle = (PI / 2.0) - v_subs;
+
+
+	float h_height = 0.0f;
+	float v_rad = 0.0f;
+
+	int vdiff = 0;
+
+	for (int v = 0; v < a_nSubdivisions; v++) {
+		h_height = sin(v_angle)*a_fRadius;
+		v_rad = cos(v_angle)*a_fRadius;
+
+
+
+		h_angle = h_subs;
+
+		vdiff = v * a_nSubdivisions;
+
+		point.push_back(vector3(v_rad, 0.0f, h_height));
+		for (int h = 1; h <= a_nSubdivisions; h++) {
+			point.push_back(vector3(cos(h_angle)*v_rad, sin(h_angle)*v_rad, h_height));
+
+			if (v == 0) {
+				AddTri(point[h - 1], point[h], top);
+			}
+			else {
+				AddQuad(point[vdiff + h - 1], point[vdiff + h], point[vdiff - a_nSubdivisions + h - 1], point[vdiff - a_nSubdivisions + h]);
+
+				if (v == a_nSubdivisions - 1) {
+					AddTri(bottom, point[vdiff + h], point[vdiff + h - 1]);
+				}
+			}
+
+			h_angle += h_subs;
+		}
+
+		v_angle -= v_subs;
+	}
 
 	//Your code ends here
 	CompileObject(a_v3Color);
