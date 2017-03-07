@@ -37,6 +37,18 @@ void AppClass::Update(void)
 
 #pragma region Your Code goes here
 	m_pMeshMngr->SetModelMatrix(IDENTITY_M4, "WallEye");
+
+	static DWORD timerSinceStart = GetTickCount();
+
+	static float fTimer = 0.0f;
+	DWORD Timer2 = GetTickCount() - timerSinceStart;
+
+	float t2 = Timer2 / 1000.0f;
+
+	m_pMeshMngr->PrintLine("");
+	m_pMeshMngr->PrintLine(std::to_string(t2));
+
+
 #pragma endregion
 
 #pragma region Does not need changes but feel free to change anything here
