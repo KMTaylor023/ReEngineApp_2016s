@@ -32,21 +32,67 @@ void AppClass::Update(void)
 
 	//cumulative time
 	static double fRunTime = 0.0f; //How much time has passed since the program started
-	fRunTime += fTimeSpan; 
+	fRunTime += fTimeSpan;
 #pragma endregion
 
 #pragma region Your Code goes here
-	m_pMeshMngr->SetModelMatrix(IDENTITY_M4, "WallEye");
 
+	///////////////timer making
 	static DWORD timerSinceStart = GetTickCount();
 
 	static float fTimer = 0.0f;
+
 	DWORD Timer2 = GetTickCount() - timerSinceStart;
 
 	float t2 = Timer2 / 1000.0f;
 
 	m_pMeshMngr->PrintLine("");
 	m_pMeshMngr->PrintLine(std::to_string(t2));
+	//-------------end Timer making
+
+	////////////////static stuff made
+	static vector3 lerpPos[] = { vector3(-4.0f,-2.0f, 5.0f),
+		vector3(1.0f,-2.0f, 5.0f),
+		vector3(-3.0f,-1.0f, 3.0f),
+		vector3(2.0f,-1.0f, 3.0f),
+		vector3(-2.0f, 0.0f, 0.0f),
+		vector3(3.0f, 0.0f, 0.0f),
+		vector3(-1.0f, 1.0f,-3.0f),
+		vector3(4.0f, 1.0f,-3.0f),
+		vector3(0.0f, 2.0f,-5.0f),
+		vector3(5.0f, 2.0f,-5.0f),
+		vector3(1.0f, 3.0f,-5.0f) };
+
+	static int lerpCount = 11;
+
+	static int curpoint = 0;
+	static int nextpoint = 1;
+
+	static float timeFrom = t2;
+	static float timeTo = t2 + 1;
+	//---------------end static stuff made
+
+	matrix4 m4SpherePos;
+	for (int i = 0; i < lerpCount; i++) {
+		m4SpherePos = glm::translate(lerpPos[i]) * glm::scale(vector3(0.1f));
+		m_pMeshMngr->AddSphereToRenderList(m4SpherePos, RERED, SOLID);
+	}
+
+	float percentage = MapValue(t2, timeFrom, timeTo, 0.0f, 1.0f);
+
+	vector3 v3Cur = glm::lerp(lerpPos[curpoint], lerpPos[nextpoint] , percentage);
+
+	if (percentage >= 1.0f) {
+		percentage = 0.0f;
+		curpoint = nextpoint;
+		nextpoint = (nextpoint + 1) % lerpCount;
+		timeFrom = t2;
+		timeTo = t2 + 1;
+	}
+
+	matrix4 m4WE = glm::translate(v3Cur);
+
+	m_pMeshMngr->SetModelMatrix(m4WE, "WallEye");
 
 
 #pragma endregion
