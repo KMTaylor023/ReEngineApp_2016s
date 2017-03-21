@@ -21,25 +21,56 @@ void AppClass::ProcessKeyboard(void)
 		bModifier = true;
 #pragma endregion
 
+
+	static float rads = 1.0f;// glm::radians(1.0f);
+	static vector3 m_v3XRot = vector3(1.0f, 0.0f, 0.0f);
+	static vector3 m_v3YRot = vector3(0.0f,1.0f, 0.0f);
+	static vector3 m_v3ZRot = vector3(0.0f, 0.0f, 1.0f);
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
 	{
 		m_v3Orientation = vector3(0.0f);
+		m_quatOrientation = quaternion();
 	}
+
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::U)) {
+		std::cout << m_quatOrientation.w << " " << m_quatOrientation.x << " " << m_quatOrientation.y << " " << m_quatOrientation.z << std::endl;
+	 }
+
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 	{
-		if (!bModifier) m_v3Orientation.x += 1.0f;
-		else m_v3Orientation.x -= 1.0f;
+		if (!bModifier) {
+			m_v3Orientation.x += 1.0f;
+			m_quatOrientation = glm::rotate(m_quatOrientation, rads, m_v3XRot);
+		}
+		else {
+			m_v3Orientation.x -= 1.0f;
+			m_quatOrientation = glm::rotate(m_quatOrientation, -rads, m_v3XRot);
+		}
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
 	{
-		if (!bModifier) m_v3Orientation.y += 1.0f;
-		else m_v3Orientation.y -= 1.0f;
+		if (!bModifier) {
+			m_v3Orientation.y += 1.0f;
+			m_quatOrientation = glm::rotate(m_quatOrientation, rads, m_v3YRot);
+		}
+		else {
+			m_v3Orientation.y -= 1.0f;
+			m_quatOrientation = glm::rotate(m_quatOrientation, -rads, m_v3YRot);
+		}
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
 	{
-		if (!bModifier) m_v3Orientation.z += 1.0f;
-		else m_v3Orientation.z -= 1.0f;
+		if (!bModifier) {
+			m_v3Orientation.z += 1.0f;
+			m_quatOrientation = glm::rotate(m_quatOrientation, rads, m_v3ZRot);
+		}
+		else {
+			m_v3Orientation.z -= 1.0f;
+			m_quatOrientation = glm::rotate(m_quatOrientation, -rads, m_v3ZRot);
+		}
 	}
 
 #pragma region Camera Positioning

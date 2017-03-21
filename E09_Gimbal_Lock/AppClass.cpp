@@ -26,12 +26,9 @@ void AppClass::Update(void)
 		CameraRotation();
 
 	//Rotation matrices
-	matrix4 rotX = glm::rotate(IDENTITY_M4, m_v3Orientation.x, REAXISX);
-	matrix4 rotY = glm::rotate(IDENTITY_M4, m_v3Orientation.y, REAXISY);
-	matrix4 rotZ = glm::rotate(IDENTITY_M4, m_v3Orientation.z, REAXISZ);
 
 	//linear combination
-	m_mToWorld = rotX * rotY * rotZ;
+	m_mToWorld = glm::toMat4(m_quatOrientation);
 
 	//Setting the model matrix
 	m_pMeshMngr->SetModelMatrix(m_mToWorld, "Steve");
@@ -39,6 +36,8 @@ void AppClass::Update(void)
 	//Adding the instance to the render list
 	m_pMeshMngr->AddInstanceToRenderList("Steve");
 
+
+	quaternion q = quaternion(vector3(45.0f, 45.0f, 45.0f));
 	int nFPS = m_pSystem->GetFPS();
 	m_pMeshMngr->PrintLine("");
 	m_pMeshMngr->PrintLine(m_pSystem->GetAppName(), REYELLOW);
