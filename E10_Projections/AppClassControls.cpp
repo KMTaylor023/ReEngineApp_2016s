@@ -27,11 +27,14 @@ void AppClass::ProcessKeyboard(void)
 	//F2 Controllers
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
 	{
+		
 	}
 
 	//F3 Controllers
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F3))
 	{
+		m_m4Projection = glm::perspective(30.0f, 1080.0f / 768.0f, 0.01f, 1000.0f);
+		m_m4View = glm::lookAt(glm::vec3(0.0f, 0.0f, 15.0f), glm::vec3(0.0f, 0.0f, 14.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	//F4 Controllers
