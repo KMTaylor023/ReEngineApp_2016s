@@ -42,6 +42,22 @@ void AppClass::Update(void)
 	
 	//Set the model matrix for the first model to be the arcball
 	m_pMeshMngr->SetModelMatrix(ToMatrix4(m_qArcBall), 0);
+
+	static float fTimer = 0.0f;
+
+	fTimer += m_pSystem->LapClock();
+	//glm::quat q1; //identity
+	//glm::quat q1 = glm::quat(0.7f, 0.0f, 0.0f, 0.7f);
+	glm::quat q1 = glm::angleAxis(90.0f, vector3(1.0f, 0.0f, 0.0f));//angle of rotation, axis of rotation
+	quaternion q2 = glm::quat(vector3(0.0f,glm::radians(90.0f), 0.0f));
+	quaternion q3 = glm::mix(q1, q2, fTimer / 2.0f);
+
+
+
+
+
+
+	m_pMeshMngr->SetModelMatrix(ToMatrix4(q3), "Creeper");
 	
 	//Adds all loaded instance to the render list
 	m_pMeshMngr->AddSkyboxToRenderList();
