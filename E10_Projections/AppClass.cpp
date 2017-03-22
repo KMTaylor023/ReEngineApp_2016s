@@ -19,7 +19,7 @@ void AppClass::InitVariables(void)
 	m_m4Projection = glm::perspective(45.0f, 1080.0f / 768.0f, 0.01f, 1000.0f);
 
 	//the left, right, bottom, and top bounds of the orthographic view, followed by the near and the far clipping planes
-	m_m4Projection = glm::ortho(-10.80f, 10.80f, -7.68f, 7.68f, 0.01f, 1000.0f);
+	//m_m4Projection = glm::ortho(-10.80f, 10.80f, -7.68f, 7.68f, 0.01f, 1000.0f);
 
 	//EYE: The point the camera is looking at, center is the position of what you are looking at, up is the normal vector to your camera
 	m_m4View = glm::lookAt(glm::vec3(0.0f, 0.0f, 15.0f), glm::vec3(0.0f, 0.0f, 14.0f), glm::vec3(0.0f, 1.0f, 0.0f));
