@@ -27,7 +27,8 @@ void AppClass::ProcessKeyboard(void)
 	//F2 Controllers
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
 	{
-		
+		m_m4Projection = glm::perspective(10.0f, 1080.0f / 768.0f, 0.01f, 1000.0f);
+		m_m4View = glm::lookAt(glm::vec3(90.0f, 0.0f, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 1.0f));
 	}
 
 	//F3 Controllers
@@ -40,11 +41,16 @@ void AppClass::ProcessKeyboard(void)
 	//F4 Controllers
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F4))
 	{
+		m_m4Projection = glm::perspective(45.0f, 1090.0f / 768.0f, 0.01f, 1000.0f);
+		m_m4View = glm::lookAt(glm::vec3(20.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	//F5 Controllers
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))
 	{
+		m_m4Projection = glm::ortho(-10.0f, 10.0f, -30.0f, 30.0f, 0.1f, 1000.0f);
+		m_m4View = glm::lookAt(glm::vec3(40.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 	}
 
 	//Exit the program
