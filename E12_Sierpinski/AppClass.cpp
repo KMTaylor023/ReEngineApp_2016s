@@ -67,6 +67,8 @@ void AppClass::Display(void)
 
 	m_pMesh->Render(m4Projection, m4View, IDENTITY_M4);//Rendering nObject(s)											   //clear the screen
 	
+	m_pMesh->Render(m4Projection, m4View, glm::translate(vector3(2.0f, 2.0f, 0.0f)));
+
 	m_pMeshMngr->Render(); //renders the render list
 	m_pMeshMngr->ClearRenderList(); //Reset the Render list after render
 	m_pGLSystem->GLSwapBuffers(); //Swaps the OpenGL buffers
