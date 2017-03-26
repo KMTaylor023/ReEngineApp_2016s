@@ -43,14 +43,54 @@ void AppClass::Update(void)
 	fRunTime += fCallTime;
 
 	//Earth Orbit
-	double fEarthHalfOrbTime = 182.5f * m_fDay; //Earths orbit around the sun lasts 365 days / half the time for 2 stops
-	float fEarthHalfRevTime = 0.5f * m_fDay; // Move for Half a day
-	float fMoonHalfOrbTime = 14.0f * m_fDay; //Moon's orbit is 28 earth days, so half the time for half a route
+	static double fEarthHalfOrbTime = 182.5f * m_fDay; //Earths orbit around the sun lasts 365 days / half the time for 2 stops
+	static float fEarthHalfRevTime = 0.5f * m_fDay; // Move for Half a day
+	static float fMoonHalfOrbTime = 14.0f * m_fDay; //Moon's orbit is 28 earth days, so half the time for half a route
+
+	//the current time of the revolution, used for the lerp percentage
+	static double earthRevTime = 0.0f;
+	static double earthOrbitTime = 0.0f;
+	static double moonOrbitTime = 0.0f;
+	
+
+	earthRevTime += fCallTime;
+	earthOrbitTime += fCallTime;
+	moonOrbitTime += fCallTime;
+
+
+
+	//the quations used for the slerp
+	static glm::quat m_qStart = glm::quat(vector3(0.0f));
+	static glm::quat m_qEnd = glm::quat(vector3(0.0f,glm::radians(359.5f),0.0f));
+
+
+
+	//the matrices for the earth and moon and sun basic transformations
+	static matrix4 m_m4EarthScale = glm::scale(vector3(0.524f));
+	static matrix4 m_m4EarthTranslate = glm::translate(11.0f, 0.0f, 0.0f);
+
+	static matrix4 m_m4MoonScale = glm::scale(m_m4EarthScale,vector3(0.27f));
+	static matrix4 m_m4MoonTranslate = glm::translate(2.0f, 0.0f, 0.0f);
+
+	static matrix4 m_m4SunScale = glm::scale(vector3(5.936f));
+
+
+	//a float for the percentage of slerp, for some reason the mix method doesn't like doubles
+	float percentRev = earthRevTime / ( 2 * fEarthHalfRevTime);
+	float percentOrb = earthOrbitTime / (2 * fEarthHalfOrbTime);
+	float percentMoonOrb = moonOrbitTime / (2 * fMoonHalfOrbTime);
+
+
+	//the three rotation matrices, created from quat slerp with mix method
+	matrix4 m_m4EarthRevolutionRotation = glm::mat4_cast(glm::mix(m_qStart, m_qEnd, percentRev));
+	matrix4 m_m4EarthOrbitRotation = glm::mat4_cast(glm::mix(m_qStart, m_qEnd, percentOrb));
+
+	matrix4 m_m4MoonOrbitRotation = glm::mat4_cast(glm::mix(m_qStart, m_qEnd, percentMoonOrb));
 
 	//Setting the matrices
-	m_pMeshMngr->SetModelMatrix(IDENTITY_M4, "Sun");
-	m_pMeshMngr->SetModelMatrix(IDENTITY_M4, "Earth");
-	m_pMeshMngr->SetModelMatrix(IDENTITY_M4, "Moon");
+	m_pMeshMngr->SetModelMatrix(m_m4SunScale, "Sun");
+	m_pMeshMngr->SetModelMatrix(m_m4EarthOrbitRotation * m_m4EarthTranslate * m_m4EarthRevolutionRotation * m_m4EarthScale, "Earth");
+	m_pMeshMngr->SetModelMatrix( m_m4EarthOrbitRotation * m_m4EarthTranslate * m_m4MoonOrbitRotation * m_m4MoonTranslate * m_m4MoonScale, "Moon");
 
 	//Adds all loaded instance to the render list
 	m_pMeshMngr->AddInstanceToRenderList("ALL");
@@ -58,6 +98,26 @@ void AppClass::Update(void)
 	static int nEarthOrbits = 0;
 	static int nEarthRevolutions = 0;
 	static int nMoonOrbits = 0;
+	
+
+	//if the rotation time reaches the max roation time, subtract max rotation time and add a rotation to the appropriate variables
+	//note, subtracting the max time instead of setting to zero, as setting to zero would cause time to be "lost"
+
+	if(earthRevTime > fEarthHalfRevTime * 2) {
+		earthRevTime -= fEarthHalfRevTime * 2;
+		nEarthRevolutions++;
+	}
+
+	if (earthOrbitTime > fEarthHalfOrbTime * 2) {
+		earthOrbitTime -= fEarthHalfOrbTime * 2;
+		nEarthOrbits++;
+	}
+
+	if (moonOrbitTime > fMoonHalfOrbTime * 2) {
+		moonOrbitTime -= fMoonHalfOrbTime * 2;
+		nMoonOrbits++;
+	}
+	
 
 	//Indicate the FPS
 	int nFPS = m_pSystem->GetFPS();
@@ -106,7 +166,7 @@ void AppClass::Display(void)
 	}
 	
 	m_pMeshMngr->Render(); //renders the render list
-
+	m_pMeshMngr->ClearRenderList(); //Reset the Render list after render
 	m_pGLSystem->GLSwapBuffers(); //Swaps the OpenGL buffers
 }
 
