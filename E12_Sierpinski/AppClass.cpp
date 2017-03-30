@@ -13,21 +13,78 @@ void AppClass::InitVariables(void)
 	m_pMesh = new MyMesh();
 	
 	//Creating the Mesh points
-	m_pMesh->AddVertexPosition(vector3(-1.0f, -1.0f, 0.0f));
+	//return;
+
+	m_fMatrixArray = new float[m_nObjects * 16];
+
+	int numberIterations = 3;
+	int m_nObjects = pow(3, numberIterations);
+	int numberRows = pow(2, numberIterations);
+
+
+	float angle = glm::radians(90.0f);
+	float size = (numberIterations == 0) ? 2.0f : 1.5f/numberIterations;
+	for (int i = 0; i < 3; i++) {
+		m_pMesh->AddVertexPosition(vector3(cos(angle) * size, sin(angle) * size, 0.0f));
+		angle += glm::radians(120.0f);
+	}
+
+	m_pMesh->AddVertexColor(REGREEN);
 	m_pMesh->AddVertexColor(RERED);
-	m_pMesh->AddVertexPosition(vector3( 1.0f, -1.0f, 0.0f));
-	m_pMesh->AddVertexColor(RERED);
-	m_pMesh->AddVertexPosition(vector3(-1.0f,  1.0f, 0.0f));
-	m_pMesh->AddVertexColor(RERED);
-	m_pMesh->AddVertexPosition(vector3(-1.0f,  1.0f, 0.0f));
-	m_pMesh->AddVertexColor(REBLUE);
-	m_pMesh->AddVertexPosition(vector3(1.0f, -1.0f, 0.0f));
-	m_pMesh->AddVertexColor(REBLUE);
-	m_pMesh->AddVertexPosition(vector3( 1.0f, 1.0f, 0.0f));
 	m_pMesh->AddVertexColor(REBLUE);
 
 	//Compiling the mesh
 	m_pMesh->CompileOpenGL3X();
+
+	float yStart = 5.0f;
+	float xStart = 0.0f;
+	float yPos = yStart;
+	float xPos = xStart;
+	
+	float xDist = size / 2.0f * sqrt(3.0f);
+	float yDist = 1.5 * size;
+
+	int cols = 1;
+	int prev = 1;
+	int tris = 0;
+	for (int i = 0; i < numberRows; i++) {
+
+		xPos = xStart;
+		yPos -= yDist;
+
+		xStart -= xDist;
+
+		prev = 1;
+
+		//the first thing in the row is always a triangle
+		const float* m4MVP = glm::value_ptr(
+			glm::translate(vector3(xPos, yPos, 0.0f))
+		);
+		memcpy(&m_fMatrixArray[tris * 16], m4MVP, 16 * sizeof(float));
+
+		tris++;
+
+		for (int j = 1; j < cols; j++) {
+			int cur = (int)(prev * ((float)(i + 1 - j)) / ((float)j));
+
+			xPos += 2*xDist;
+
+			if ( cur % 2 == 1) {
+				printf(" " + ((int)(prev * ((float)(i + 1 - j)) / ((float)j))));
+				const float* m4MVP = glm::value_ptr(
+					glm::translate(vector3(xPos, yPos, 0.0f))
+				);
+				memcpy(&m_fMatrixArray[tris * 16], m4MVP, 16 * sizeof(float));
+				tris++;
+				
+			}
+
+			prev = cur;
+		}
+		cols++;
+	}
+
+
 }
 
 void AppClass::Update(void)
@@ -65,9 +122,7 @@ void AppClass::Display(void)
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 
-	m_pMesh->Render(m4Projection, m4View, IDENTITY_M4);//Rendering nObject(s)											   //clear the screen
-	
-	m_pMesh->Render(m4Projection, m4View, glm::translate(vector3(2.0f, 2.0f, 0.0f)));
+	m_pMesh->RenderList(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), m_fMatrixArray, m_nObjects);//Rendering nObjects
 
 	m_pMeshMngr->Render(); //renders the render list
 	m_pMeshMngr->ClearRenderList(); //Reset the Render list after render
