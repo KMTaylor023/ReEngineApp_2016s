@@ -6,14 +6,36 @@ Date: 2015/09 (Last Modified on: 15/11)
 #define __APPLICATION_H_
 
 #include "RE\ReEngAppClass.h"
+#include "A8CameraClass.h"
+#include "MyPrimitive.h"
+
 #include <SFML\Graphics.hpp>
 
 using namespace ReEng; //Using ReEng namespace to use all the classes in the dll
 
 class AppClass : public ReEngAppClass
 {
+	MyPrimitive* cube1 = nullptr;
+	MyPrimitive* cube2 = nullptr;
+	MyPrimitive* cube3 = nullptr;
+
+	MyPrimitive* sphere = nullptr;
+	MyPrimitive* cone = nullptr;
+	MyPrimitive* cylinder = nullptr;
+
+	matrix4 k_m4Cube1;
+	matrix4 k_m4Cube2;
+	matrix4 k_m4Cube3;
+
+	matrix4 k_m4Sphere;
+	matrix4 k_m4Cone;
+	matrix4 k_m4Cylinder;
+
 public:
 	typedef ReEngAppClass super;
+
+
+
 
 	/*
 	USAGE: Constructor
@@ -87,6 +109,10 @@ public:
 	OUTPUT: ---
 	*/
 	virtual void Release(void) final;
+
+
+private:
+	A8CameraClass* a8Camera;
 };
 /*
 USAGE:

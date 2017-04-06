@@ -25,36 +25,49 @@ void AppClass::ProcessKeyboard(void)
 	if(bModifier)
 		fSpeed *= 10.0f;
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-		m_pCameraMngr->MoveForward(fSpeed);
+		a8Camera->MoveForward(fSpeed);
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		m_pCameraMngr->MoveForward(-fSpeed);
+		a8Camera->MoveForward(-fSpeed);
 	
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		m_pCameraMngr->MoveSideways(-fSpeed);
+		a8Camera->MoveSideways(-fSpeed);
 
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-		m_pCameraMngr->MoveSideways(fSpeed);
+		a8Camera->MoveSideways(fSpeed);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-		m_pCameraMngr->MoveVertical(-fSpeed);
+		a8Camera->MoveVertical(fSpeed);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-		m_pCameraMngr->MoveVertical(fSpeed);
+		a8Camera->MoveVertical(-fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad7))
+		a8Camera->ChangeRoll(fSpeed);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad9))
+		a8Camera->ChangeRoll(-fSpeed);				
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4))
+		a8Camera->ChangePitch(fSpeed);				
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad6))
+		a8Camera->ChangePitch(-fSpeed);				
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1))
+		a8Camera->ChangeYaw(fSpeed);				
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad3))
+		a8Camera->ChangeYaw(-fSpeed);
+
 #pragma endregion
 
 #pragma region Other Actions
 	ON_KEY_PRESS_RELEASE(Escape, NULL, PostMessage(m_pWindow->GetHandler(), WM_QUIT, NULL, NULL));
-	ON_KEY_PRESS_RELEASE(F1, NULL, m_pCameraMngr->SetCameraMode(CAMPERSP));
-	ON_KEY_PRESS_RELEASE(F2, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOZ));
-	ON_KEY_PRESS_RELEASE(F3, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOY));
-	ON_KEY_PRESS_RELEASE(F4, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOX));
-	static bool bFPSControll = false;
-	ON_KEY_PRESS_RELEASE(F, bFPSControll = !bFPSControll, m_pCameraMngr->SetFPS(bFPSControll));
 #pragma endregion
 }
 void AppClass::ProcessMouse(void)
 {
+
+	//not sure how to deal with this yet
+
+	return;
+
 	m_bArcBall = false;
 	m_bFPC = false;
 #pragma region ON_MOUSE_PRESS_RELEASE

@@ -88,8 +88,24 @@ public:
 	~A8CameraClass();
 
 private:
+
+	/*
+	USAGE: Updates the direction vectors based on the quaternion orientation
+	ARGUMENTS: ---
+	OUTPUT: ---
+	*/
+	void UpdateDirectionVectorsFromQuat(void);
+
 	vector3 k_v3Position;
 	vector3 k_v3Target;
 	vector3 k_v3Up;
 	vector3 k_v3Right;
+	vector3 k_v3Front;
+
+
+	vector3 k_v3UpStart;
+	vector3 k_v3RightStart;
+	vector3 k_v3FrontStart;
+
+	quaternion k_qOrientation;
 };
