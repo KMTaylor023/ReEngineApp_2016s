@@ -39,7 +39,7 @@ void AppClass::Update(void)
 
 	quaternion q = quaternion(vector3(45.0f, 45.0f, 45.0f));
 	int nFPS = m_pSystem->GetFPS();
-	m_pMeshMngr->PrintLine("");
+	m_pMeshMngr->PrintLine("");//Add a line on top
 	m_pMeshMngr->PrintLine(m_pSystem->GetAppName(), REYELLOW);
 	m_pMeshMngr->Print("X:", REYELLOW);
 	m_pMeshMngr->PrintLine(std::to_string(m_v3Orientation.x), RERED);
