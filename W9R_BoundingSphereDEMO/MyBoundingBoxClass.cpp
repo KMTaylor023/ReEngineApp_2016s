@@ -49,6 +49,11 @@ MyBoundingBoxClass::MyBoundingBoxClass(std::vector<vector3> vertexList)
 
 	m_v3MinG = m_v3Min;
 	m_v3MaxG = m_v3Max;
+
+	m_v3MaxGAABB = m_v3Max;
+	m_v3MinGAABB = m_v3Min;
+
+	m_v3SizeG = m_v3Size;
 	
 	//m_v3Size.x = glm::distance(vector3(m_v3Min.x, 0.0, 0.0), vector3(m_v3Max.x, 0.0, 0.0));
 	//m_v3Size.y = glm::distance(vector3(0.0, m_v3Min.y, 0.0), vector3(0.0, m_v3Max.y, 0.0));
@@ -60,6 +65,13 @@ void MyBoundingBoxClass::RenderSphere()
 	vector3 v3Color = REGREEN;
 	if (true == m_bColliding)
 		v3Color = RERED;
+
+
+
+	m_pMeshMngr->AddCubeToRenderList(
+		glm::translate(m_v3CenterGlobal) *
+		glm::scale(m_v3SizeG),
+		v3Color, WIRE);
 
 	m_pMeshMngr->AddCubeToRenderList(
 		m_m4ToWorld *
@@ -74,25 +86,75 @@ void MyBoundingBoxClass::SetModelMatrix(matrix4 a_m4ToWorld)
 
 	m_m4ToWorld = a_m4ToWorld;
 	m_v3CenterGlobal = vector3(m_m4ToWorld * vector4(m_v3CenterLocal, 1.0f));
+
+
+
+
+
 	m_v3MinG = vector3(m_m4ToWorld * vector4(m_v3Min, 1.0f));
 	m_v3MaxG = vector3(m_m4ToWorld * vector4(m_v3Max, 1.0f));
+
+
+
+	vector3 newPoints[8] = { vector3(m_m4ToWorld * vector4(m_v3Min.x,m_v3Min.y,m_v3Max.z, 1.0f)),
+							vector3(m_m4ToWorld * vector4(m_v3Min.x,m_v3Max.y,m_v3Max.z, 1.0f)),
+							vector3(m_m4ToWorld * vector4(m_v3Max.x,m_v3Min.y,m_v3Max.z, 1.0f)),
+							vector3(m_m4ToWorld * vector4(m_v3Max.x,m_v3Max.y,m_v3Min.z, 1.0f)),
+							vector3(m_m4ToWorld * vector4(m_v3Min.x,m_v3Max.y,m_v3Min.z, 1.0f)),
+							vector3(m_m4ToWorld * vector4(m_v3Max.x,m_v3Min.y,m_v3Min.z, 1.0f))
+							, m_v3MinG , m_v3MaxG };
+
+
+	m_v3MinGAABB = newPoints[0];
+	m_v3MaxGAABB = newPoints[0];
+
+	for (int i = 0; i < 8; i++) {
+		if (m_v3MinGAABB.x > newPoints[i].x)
+		{
+			m_v3MinGAABB.x = newPoints[i].x;
+		}
+		else if (m_v3MaxGAABB.x < newPoints[i].x)
+		{
+			m_v3MaxGAABB.x = newPoints[i].x;
+		}
+
+		if (m_v3MinGAABB.y > newPoints[i].y)
+		{
+			m_v3MinGAABB.y = newPoints[i].y;
+		}
+		else if (m_v3MaxGAABB.y < newPoints[i].y)
+		{
+			m_v3MaxGAABB.y = newPoints[i].y;
+		}
+
+		if (m_v3MinGAABB.z > newPoints[i].z)
+		{
+			m_v3MinGAABB.z = newPoints[i].z;
+		}
+		else if (m_v3MaxGAABB.z < newPoints[i].z)
+		{
+			m_v3MaxGAABB.z = newPoints[i].z;
+		}
+	}
+
+	m_v3SizeG = m_v3MaxGAABB - m_v3MinGAABB;
 }
 
 bool MyBoundingBoxClass::IsColliding(MyBoundingBoxClass* a_other)
 {
-	if (this->m_v3MaxG.x < a_other->m_v3MinG.x)
+	if (this->m_v3MaxGAABB.x < a_other->m_v3MinGAABB.x)
 		return false;
-	if (this->m_v3MinG.x > a_other->m_v3MaxG.x)
-		return false;
-
-	if (this->m_v3MaxG.y < a_other->m_v3MinG.y)
-		return false;
-	if (this->m_v3MinG.y > a_other->m_v3MaxG.y)
+	if (this->m_v3MinGAABB.x > a_other->m_v3MaxGAABB.x)
 		return false;
 
-	if (this->m_v3MaxG.z < a_other->m_v3MinG.z)
+	if (this->m_v3MaxGAABB.y < a_other->m_v3MinGAABB.y)
 		return false;
-	if (this->m_v3MinG.z > a_other->m_v3MaxG.z)
+	if (this->m_v3MinGAABB.y > a_other->m_v3MaxGAABB.y)
+		return false;
+
+	if (this->m_v3MaxGAABB.z < a_other->m_v3MinGAABB.z)
+		return false;
+	if (this->m_v3MinGAABB.z > a_other->m_v3MaxGAABB.z)
 		return false;
 
 	return true;
